@@ -44,3 +44,5 @@ export interface IOrderResult {
   id: string
   total: number
 }
+
+export type IErrorBuyer = Partial<Record<keyof IBuyer, string>>

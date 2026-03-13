@@ -1,7 +1,7 @@
-import { IBuyer } from '../../types'
+import { IBuyer, IErrorBuyer } from '../../types'
 
 export class Buyer {
-  protected payment: IBuyer['payment'] | null = null
+  protected payment: IBuyer['payment'] | null
   protected address: string = ''
   protected email: string = ''
   protected phone: string = ''
@@ -29,8 +29,31 @@ export class Buyer {
     this.phone = ''
   }
 
-  validate(): Partial<Record<keyof IBuyer, string>> {
-    const errors: Partial<Record<keyof IBuyer, string>> = {}
+  //   validate(): Partial<Record<keyof IBuyer, string>> {
+  //     const errors: Partial<Record<keyof IBuyer, string>> = {}
+
+  //     if (!this.payment) {
+  //       errors.payment = 'Не выбран вид оплаты'
+  //     }
+
+  //     if (!this.address) {
+  //       errors.address = 'Укажите адрес'
+  //     }
+
+  //     if (!this.email) {
+  //       errors.email = 'Укажите email'
+  //     }
+
+  //     if (!this.phone) {
+  //       errors.phone = 'Укажите телефон'
+  //     }
+
+  //     return errors
+  //   }
+  // }
+
+  validate(): IErrorBuyer {
+    const errors: IErrorBuyer = {}
 
     if (!this.payment) {
       errors.payment = 'Не выбран вид оплаты'

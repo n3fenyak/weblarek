@@ -25,13 +25,19 @@ console.log('выбранный товар:', productsModel.getPreviewItem())
 
 //basket
 basketModel.addItem(firstProduct)
+basketModel.addItem(firstProduct)
+
 console.log('Товары в корзине:', basketModel.getItems())
 console.log('Количество товаров:', basketModel.getItemsCount())
 console.log('Общая стоимость:', basketModel.getTotalPrice())
 console.log('Есть ли товар в корзине:', basketModel.hasItem(firstProduct.id))
 
 basketModel.removeItem(firstProduct.id)
-console.log('Корзина после удаления:', basketModel.getItems())
+console.log('Корзина после удаления товара:', basketModel.getItems())
+
+console.log('Корзина перед очисткой:', basketModel.getItems())
+basketModel.clear()
+console.log('Корзина после очистки:', basketModel.getItems())
 
 //buyer
 buyerModel.setData({
@@ -39,10 +45,22 @@ buyerModel.setData({
   phone: '1111',
 })
 
+buyerModel.setData({
+  payment: 'card',
+  email: 'test@weblarek.com',
+  phone: '88005553535',
+  address: 'Москва',
+})
+
 console.log('Данные покупателя:', buyerModel.getData())
 console.log('Ошибки валидации:', buyerModel.validate())
 
-webLarekApi.getProducts().then((data) => {
-  productsModel.setItems(data.items)
-  console.log('Каталог товаров с сервера:', productsModel.getItems())
-})
+webLarekApi
+  .getProducts()
+  .then((data) => {
+    productsModel.setItems(data.items)
+    console.log('Каталог товаров с сервера:', productsModel.getItems())
+  })
+  .catch((err) => {
+    console.log('Ошибка', err)
+  })
