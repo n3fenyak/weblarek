@@ -45,6 +45,9 @@ buyerModel.setData({
   phone: '1111',
 })
 
+console.log('Данные покупателя (неполные):', buyerModel.getData())
+console.log('Ошибки валидации:', buyerModel.validate())
+
 buyerModel.setData({
   payment: 'card',
   email: 'test@weblarek.com',
@@ -52,8 +55,12 @@ buyerModel.setData({
   address: 'Москва',
 })
 
-console.log('Данные покупателя:', buyerModel.getData())
-console.log('Ошибки валидации:', buyerModel.validate())
+console.log('Данные покупателя (валидные):', buyerModel.getData())
+console.log('Результат валидации (валидные):', buyerModel.validate())
+
+buyerModel.clear()
+
+console.log('Данные покупателя после очистки:', buyerModel.getData())
 
 webLarekApi
   .getProducts()
