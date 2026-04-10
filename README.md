@@ -241,3 +241,194 @@ interface IProductsResponse {
 `createOrder(order: IOrder): Promise<IOrderResult>` - выполняет POST-запрос на эндпоинт `/order/` и отправляет данные заказа на сервер.
 
 Возвращает объект с подтверждением заказа и суммой покупки
+
+## Слой Views
+
+### Интерфейс IHeader
+
+Назначение: Класс отвечает за отображение шапки сайта, включая иконку корзины и счетчик товаров.
+
+Конструктор:
+`constructor(events: IEvents, container: HTMLElement)`
+
+IEvents — брокер событий для взаимодействия с приложением. container: HTMLElement — HTML-элемент, в котором рендерится шапка.
+
+Поля: counterElement: HTMLElement — DOM-элемент для отображения количества товаров. basketButton: HTMLButtonElement — кнопка открытия корзины.
+
+Методы: set counter(value: number) — обновляет отображаемое количество товаров в шапке
+
+## Gallery
+
+### Интерфейс IGallery
+
+interface IGallery { catalog: HTMLElement[]; // Массив элементов карточек каталога }
+
+Назначение: Класс отвечает за отображение каталога товаров на странице.
+
+Конструктор:
+`constructor(events: IEvents, container: HTMLElement)`
+
+events: IEvents — брокер событий. container: HTMLElement — контейнер для галереи.
+
+Поля: нет дополнительных полей, используется container из Component.
+
+Методы: set catalog(items: HTMLElement[]) — заменяет содержимое галереи на новые карточки товаров.
+
+## Modal
+
+### Интерфейс IModal
+
+interface IModal { content: HTMLElement; // Содержимое модального окна }
+
+Назначение: Класс управляет модальными окнами, включая показ и скрытие.
+
+Конструктор: constructor(events: IEvents, container: HTMLElement)
+
+events: IEvents — брокер событий. container: HTMLElement — контейнер модального окна.
+
+Поля: modalContainer: HTMLElement — корневой контейнер модального окна. modalContent: HTMLElement — контейнер для динамического контента. modalButton: HTMLButtonElement — кнопка закрытия модального окна.
+
+Методы : show(): void — открывает модальное окно и блокирует прокрутку страницы. hide(): void — закрывает окно и разблокирует прокрутку. set content(element: HTMLElement) — устанавливает содержимое окна.
+
+## BasketView
+
+### Интерфейс IBasketView
+
+interface IBasketView { items: HTMLElement[]; // Список товаров в корзине total: number; // Общая стоимость disabled: boolean; // Флаг блокировки кнопки оформления }
+
+Назначение: Отвечает за визуальное отображение корзины товаров и управление кнопкой оформления заказа.
+
+Конструктор: constructor(container: HTMLElement, events: IEvents)
+
+container: HTMLElement — контейнер для корзины. events: IEvents — брокер событий.
+
+Поля: basketList: HTMLElement — список элементов корзины. totalPrice: HTMLElement — элемент для отображения суммы. basketButton: HTMLButtonElement — кнопка оформления заказа. emptyText: HTMLElement — текст для пустой корзины.
+
+Методы: set items(items: HTMLElement[]) — обновляет список товаров. set total(value: number) — обновляет общую стоимость корзины. set disabled(value: boolean) — блокирует/разблокирует кнопку оформления.
+
+## SuccessView
+
+### Интерфейс ISuccessView
+
+interface ISuccessView { total: number; // Сумма, списанная за заказ }
+
+Назначение: Отображает сообщение об успешном оформлении заказа.
+
+Конструктор: constructor(container: HTMLElement, events: IEvents)
+
+container: HTMLElement — контейнер для успешного уведомления. events: IEvents — брокер событий.
+
+Поля: description: HTMLElement — элемент для текста уведомления. successButton: HTMLButtonElement — кнопка закрытия окна.
+
+Методы: set total(value: number) — отображает списанную сумму.
+
+## Card
+
+### Интерфейс ICard
+
+interface ICard { title: string; price: string; }
+
+Назначение: Базовый класс для карточек товаров (каталог, просмотр, корзина).
+
+Конструктор: constructor(container: HTMLElement)
+
+container: HTMLElement — контейнер карточки.
+
+Поля: titleCard: HTMLElement — элемент для заголовка. priceCard: HTMLElement — элемент для цены.
+
+Методы: set title(value: string) — обновляет заголовок. set price(value: string) — обновляет цену.
+
+## CardCatalog
+
+## Интерфейс ICardCatalog
+
+interface ICardCatalog extends ICard { category: string; image: string; }
+
+Назначение: Отображает карточку товара в каталоге. При клике вызывает переданную функцию (обычно используется для открытия превью).
+
+Конструктор: constructor(container: HTMLElement, onClick: () => void)
+
+container: HTMLElement — контейнер карточки. onClick — callback, вызываемый при клике на карточку.
+
+Поля: imageCard: HTMLImageElement — изображение товара (.card**image) categoryCard: HTMLElement — элемент категории (.card**category) onClick: () => void — обработчик клика по карточке
+
+Методы: set category(value: string) — устанавливает текст категории и применяет CSS-модификатор из categoryMap. set image(src: string) — устанавливает источник изображения. render(data?: Partial): HTMLElement Рендерит карточку и обновляет category и image при передаче данных
+
+## CardPreview
+
+### Интерфейс ICardPreview
+
+interface ICardPreview extends ICard { category: string; image: string; text: string; inBasket: boolean; available: boolean; }
+
+Назначение: Карточка полного просмотра товара. Позволяет добавить товар в корзину или удалить из неё.
+
+Конструктор: constructor(container: HTMLElement, onAction: () => void)
+
+container: HTMLElement — контейнер карточки. onAction — callback, вызываемый при нажатии на кнопку действия.
+
+Поля: imageCard: HTMLImageElement — изображение товара categoryCard: HTMLElement — категория textCard: HTMLElement — описание товара (.card**text) buttonCard: HTMLButtonElement — кнопка действия (.card**button) onAction: () => void — обработчик клика по кнопке
+
+Методы: set category(value: string) — обновляет категорию и CSS-класс. set image(src: string) — обновляет изображение. set text(value: string) — обновляет описание. set available(value: boolean) — влючает/выключает кнопку. Если товар недоступен — кнопка блокируется и получает текст "Недоступно". set inBasket(value: boolean) — меняет текст кнопки: "Удалить из корзины" — если товар уже в корзине "Купить" — если товара нет в корзине Не изменяется, если кнопка disabled. render(data?: Partial): HTMLElement Обновляет карточку данными и возвращает контейнер.
+
+## CardBasket
+
+### Интерфейс ICardBasket
+
+interface ICardBasket extends ICard { index: number; } Назначение: Отображает товар внутри корзины. Позволяет удалить товар из корзины.
+
+Конструктор: constructor(container: HTMLElement, onClick: () => void)
+
+container: HTMLElement — контейнер карточки. onClick — callback, вызываемый при клике на кнопку в карточке.
+
+Поля класса: indexElement: HTMLElement — элемент позиции в корзине (.basket**item-index) button: HTMLButtonElement — кнопка удаления (.card**button) onClick: () => void — обработчик клика по кнопки в карточке
+
+Методы: set index(value: number) — устанавливает порядковый номер товара в корзине.
+
+## Form
+
+### Интерфейс IForm
+
+export interface IForm { valid: boolean; // Флаг валидности формы errors: string; // Строка с сообщениями об ошибках }
+
+Назначение: Базовый класс для всех форм приложения. Отвечает за: привязку HTML-формы к компоненту, управление кнопкой отправки (активация/деактивация), отображение ошибок в форме, генерацию событий при вводе данных и отправке формы.
+
+Конструктор: constructor(container: HTMLElement, events: IEvents)
+
+container: HTMLElement — контейнер формы, может быть
+
+или любой другой элемент-шаблон. events: IEvents — брокер событий для взаимодействия с остальной частью приложения.
+Поля класса: form: HTMLFormElement — HTML-форма, привязанная к компоненту. submitButton: HTMLButtonElement — кнопка отправки формы. errorContainer: HTMLElement — контейнер для вывода ошибок формы. submitEvent: string — имя события, которое генерируется при отправке формы.
+
+Методы и свойства класса: set valid(value: boolean) — включает или отключает кнопку отправки формы. value: boolean — true означает, что форма валидна и кнопку можно нажимать. set errors(value: string) — устанавливает текст ошибки в форме. value: string — текст ошибок, которые будут показаны пользователю.
+
+## OrderForm
+
+### Интерфейс IOrderForm
+
+interface IOrderForm extends IForm { address: string; // Адрес доставки товара payment: string; // Выбранный способ оплаты }
+
+Назначение: Класс управляет формой оформления заказа: выбором способа оплаты и вводом адреса. Обеспечивает генерацию событий при изменении данных и выборе оплаты.
+
+Конструктор: constructor(container: HTMLElement, events: IEvents)
+
+container: HTMLElement — контейнер формы (обычно шаблон формы). events: IEvents — брокер событий для взаимодействия с остальной частью приложения.
+
+Поля: paymentContainer: HTMLElement — контейнер для кнопок выбора способа оплаты. paymentButtons: NodeListOf — кнопки внутри контейнера оплаты. addressInput: HTMLInputElement — поле ввода адреса. submitEvent = 'order:submit' — событие отправки формы (переход к следующему шагу).
+
+Методы: set payment(value: string) — подсвечивает выбранную кнопку оплаты. set address(value: string) — устанавливает значение поля адреса.
+
+## ContactsForm
+
+### Интерфейс IContactsForm
+
+interface IContactsForm extends IForm { email: string; // Адрес электронной почты покупателя phone: string; // Телефон покупателя }
+
+Назначение: Класс управляет формой контактных данных покупателя. Отвечает за обработку ввода email и телефона, а также за генерацию событий для обновления данных и отправки формы.
+
+Конструктор: constructor(container: HTMLElement, events: IEvents)
+
+container: HTMLElement — контейнер формы (шаблон формы контактов). events: IEvents — брокер событий для взаимодействия с приложением.
+
+Поля: emailInput: HTMLInputElement — поле ввода email. phoneInput: HTMLInputElement — поле ввода телефона. submitEvent = 'contacts:submit' — событие отправки формы контактов.
+
+Методы: set email(value: string) — обновляет значение поля email. set phone(value: string) — обновляет значение поля телефона.

@@ -45,4 +45,13 @@ export interface IOrderResult {
   total: number
 }
 
+export interface IOrderRequest {
+  payment: string
+  email: string
+  phone: string
+  address: string
+  items: string[]
+  total: number
+}
+
 export type IErrorBuyer = Partial<Record<keyof IBuyer, string>>
