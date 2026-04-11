@@ -1,3 +1,5 @@
+import './scss/styles.scss'
+
 import { Products } from './components/Models/Products'
 import { Basket } from './components/Models/Basket'
 import { Buyer } from './components/Models/Buyer'
@@ -29,9 +31,9 @@ const events = new EventEmitter()
 const api = new Api(API_URL)
 const webLarekApi = new WebLarekApi(api)
 
-const productsModel = new Products()
-const basketModel = new Basket()
-const buyerModel = new Buyer()
+const productsModel = new Products(events)
+const basketModel = new Basket(events)
+const buyerModel = new Buyer(events)
 
 const header = new Header(events, document.querySelector('.header')!)
 const gallery = new Gallery(events, document.querySelector('.gallery')!)
@@ -43,6 +45,10 @@ const successView = new SuccessView(cloneTemplate('#success'), events)
 const orderForm = new OrderForm(cloneTemplate('#order'), events)
 const contactsForm = new ContactsForm(cloneTemplate('#contacts'), events)
 
+const cardPreview = new CardPreview(cloneTemplate('#card-preview'), () =>
+  events.emit('card:toggle')
+)
+/*
 const cardPreview = new CardPreview(cloneTemplate('#card-preview'), () => {
   const item = productsModel.getPreviewItem()
   if (!item) return
@@ -54,7 +60,7 @@ const cardPreview = new CardPreview(cloneTemplate('#card-preview'), () => {
   }
 
   modal.hide()
-})
+}) */
 
 webLarekApi
   .getProducts()
@@ -78,6 +84,61 @@ events.on('products:set', ({ items }: { items: IProduct[] }) => {
   })
 
   gallery.catalog = cards
+})
+
+events.on('card:preview', ({ id }: { id: string }) => {
+  const item = productsModel.getItemById(id)
+  if (!item) return
+
+  productsModel.setPreviewItem(item)
+})
+
+events.on('products:preview', ({ item }: { item: IProduct }) => {
+  cardPreview.render({
+    title: item.title,
+    price: item.price !== null ? `${item.price} синапсов` : 'Бесценно',
+    category: item.category,
+    image: item.image,
+    text: item.description,
+    inBasket: basketModel.hasItem(item.id),
+    available: !!item.price,
+  })
+
+  modal.content = cardPreview.render()
+  modal.show()
+})
+
+// events.on('card:preview', ({ id }: { id: string }) => {
+//   const item = productsModel.getItemById(id)
+//   if (!item) return
+
+//   productsModel.setPreviewItem(item)
+
+//   cardPreview.render({
+//     title: item.title,
+//     price: item.price !== null ? `${item.price} синапсов` : 'Бесценно',
+//     category: item.category,
+//     image: item.image,
+//     text: item.description,
+//     inBasket: basketModel.hasItem(id),
+//     available: !!item.price,
+//   })
+
+//   modal.content = cardPreview.render()
+//   modal.show()
+// })
+
+events.on('card:toggle', () => {
+  const item = productsModel.getPreviewItem()
+  if (!item) return
+
+  if (basketModel.hasItem(item.id)) {
+    basketModel.removeItem(item.id)
+  } else {
+    basketModel.addItem(item)
+  }
+
+  modal.hide()
 })
 
 events.on('basket:change', () => {
@@ -109,42 +170,21 @@ events.on('basket:change', () => {
   }
 })
 
-events.on('card:preview', ({ id }: { id: string }) => {
-  const item = productsModel.getItemById(id)
-  if (!item) return
+//   const item = productsModel.getItemById(id)
+//   if (!item) return
 
-  productsModel.setPreviewItem(item)
+//   const isPreviewOpen = modal.content?.querySelector('.card_full') !== null
 
-  cardPreview.render({
-    title: item.title,
-    price: item.price !== null ? `${item.price} синапсов` : 'Бесценно',
-    category: item.category,
-    image: item.image,
-    text: item.description,
-    inBasket: basketModel.hasItem(id),
-    available: !!item.price,
-  })
+//   if (basketModel.hasItem(id)) {
+//     basketModel.removeItem(id)
+//   } else {
+//     basketModel.addItem(item)
+//   }
 
-  modal.content = cardPreview.render()
-  modal.show()
-})
-
-events.on('card:toggle', ({ id }: { id: string }) => {
-  const item = productsModel.getItemById(id)
-  if (!item) return
-
-  const isPreviewOpen = modal.content?.querySelector('.card_full') !== null
-
-  if (basketModel.hasItem(id)) {
-    basketModel.removeItem(id)
-  } else {
-    basketModel.addItem(item)
-  }
-
-  if (isPreviewOpen) {
-    modal.hide()
-  }
-})
+//   if (isPreviewOpen) {
+//     modal.hide()
+//   }
+// })
 
 events.on('basket:remove', ({ id }: { id: string }) => {
   basketModel.removeItem(id)
@@ -205,9 +245,7 @@ events.on('buyer:change', (data: IBuyer) => {
 events.on('order:submit', () => {
   const errors = buyerModel.validate()
 
-  if (errors.payment || errors.address) {
-    return
-  }
+  if (errors.payment || errors.address) return
 
   modal.content = contactsForm.render()
 })
@@ -215,9 +253,7 @@ events.on('order:submit', () => {
 events.on('contacts:submit', () => {
   const errors = buyerModel.validate()
 
-  if (errors.email || errors.phone) {
-    return
-  }
+  if (errors.email || errors.phone) return
 
   const buyerData = buyerModel.getData()
   if (!buyerData.payment) return
@@ -233,12 +269,12 @@ events.on('contacts:submit', () => {
   webLarekApi
     .createOrder(orderData)
     .then((response) => {
-      const total = response.total
+      // const total = response.total
 
       basketModel.clear()
       buyerModel.clear()
 
-      successView.total = total
+      successView.total = response.total
 
       modal.content = successView.render()
       modal.show()

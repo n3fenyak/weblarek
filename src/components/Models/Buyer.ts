@@ -1,16 +1,21 @@
 import { IBuyer, IErrorBuyer } from '../../types'
+import { EventEmitter } from '../base/Events'
 
 export class Buyer {
-  protected payment: IBuyer['payment'] | null
+  protected payment: IBuyer['payment'] | null = null
   protected address: string = ''
   protected email: string = ''
   protected phone: string = ''
+
+  constructor(protected events: EventEmitter) {}
 
   setData(data: Partial<IBuyer>): void {
     if (data.payment !== undefined) this.payment = data.payment
     if (data.address !== undefined) this.address = data.address
     if (data.email !== undefined) this.email = data.email
     if (data.phone !== undefined) this.phone = data.phone
+
+    this.events.emit('buyer:change', this.getData())
   }
 
   getData(): IBuyer {
